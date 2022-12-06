@@ -78,7 +78,7 @@ class DemoChatApplicationTests {
     void test2() throws Exception {
 
         CompletableFuture<OutputMessage> completableFuture = new CompletableFuture<>();
-        System.out.println(stompClient.getMessageConverter());
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
         StompSession session = stompClient
                 .connectAsync(getWsUrl(), new StompSessionHandlerAdapter() {})
                 .get(1, TimeUnit.SECONDS);
@@ -95,7 +95,7 @@ class DemoChatApplicationTests {
             }
         });
         session.send("/app/messages", new InputMessage("Hello Mike", "eld"));
-        assertEquals("Hello Mike by eld", completableFuture.get(1, TimeUnit.SECONDS));
+        assertEquals("Hello Mike by eld", completableFuture.get(1, TimeUnit.SECONDS).getContent());
 
     }
 
