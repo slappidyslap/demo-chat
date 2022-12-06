@@ -54,9 +54,12 @@ public class ChatController {
 
     @MessageMapping("/messages")
     void processMessageForUser(
-            @Payload InputMessage payload
+            Message<InputMessage> inputMessage
     ) {
-        OutputMessage outputMessage = new OutputMessage(payload.getContent() + " by " + payload.getFrom());
+        InputMessage payload = inputMessage.getPayload();
+        Message<OutputMessage> outputMessage
+                = MessageBuilder.withPayload(
+                        new OutputMessage(payload.getContent() + " by " + payload.getFrom())).build();
         messagingTemplate.convertAndSend(
                 "/topic/on-message", outputMessage);
     }

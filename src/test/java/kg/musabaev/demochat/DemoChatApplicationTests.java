@@ -1,22 +1,23 @@
 package kg.musabaev.demochat;
 
-import lombok.extern.log4j.Log4j2;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.messaging.converter.ByteArrayMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.messaging.simp.stomp.*;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MimeType;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -27,11 +28,11 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Log4j2
 class DemoChatApplicationTests {
 
     @LocalServerPort
     private int port;
+    private static final Logger log = Logger.getLogger(DemoChatApplicationTests.class.getName());
 
     private WebSocketStompClient stompClient;
 
@@ -77,7 +78,7 @@ class DemoChatApplicationTests {
     void test2() throws Exception {
 
         CompletableFuture<OutputMessage> completableFuture = new CompletableFuture<>();
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        System.out.println(stompClient.getMessageConverter());
         StompSession session = stompClient
                 .connectAsync(getWsUrl(), new StompSessionHandlerAdapter() {})
                 .get(1, TimeUnit.SECONDS);
@@ -94,7 +95,7 @@ class DemoChatApplicationTests {
             }
         });
         session.send("/app/messages", new InputMessage("Hello Mike", "eld"));
-        assertEquals("Hello Mike by eld", completableFuture.get(1, TimeUnit.SECONDS).getContent());
+        assertEquals("Hello Mike by eld", completableFuture.get(1, TimeUnit.SECONDS));
 
     }
 
